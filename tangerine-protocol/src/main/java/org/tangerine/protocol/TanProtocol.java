@@ -82,7 +82,7 @@ public class TanProtocol {
 		Packet packet = new Packet(Packet.Type.PCK_DATA);
 		
 		
-		packet.setPayload(Unpooled.wrappedBuffer(JsonUtil.toJsonBytes(response)));
+		packet.setPayload(Unpooled.wrappedBuffer(JsonUtil.toJsonBytes()));
 		packet.setLength(packet.getPayload().writerIndex());
 		
 		return packet;
