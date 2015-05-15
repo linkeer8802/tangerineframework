@@ -9,5 +9,8 @@ public final class Constant {
 		
 		/**心跳时间间隔，单位为秒**/
 		public static final int heartbeat = 3;
+		
+		/**版本号**/
+		public static final String version = "1.0";
 	}
 }

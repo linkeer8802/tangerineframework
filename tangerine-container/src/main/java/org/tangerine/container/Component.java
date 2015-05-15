@@ -1,10 +1,33 @@
 package org.tangerine.container;
 
-public interface Component {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-	public void start();
+public abstract class Component {
+
+	Log log = LogFactory.getLog(Component.class);
 	
-	public void afterStart();
+	public Component() {
+		try {
+			initialize();
+		} catch (Exception e) {
+			log.error("initialize component[" + name() + "] failure", e);
+		}
+	}
+	/**
+	 * 组件的名称
+	 * @return
+	 */
+	protected String name() {
+		ComponentDef def = this.getClass().getAnnotation(ComponentDef.class);
+		return def == null ? this.getClass().getSimpleName() : def.value();
+	}
 	
-	public void stop();
+	public abstract void initialize() throws Exception;
+	
+	public abstract void start() throws Exception;
+	
+	public void afterStart() throws Exception {};
+	
+	public abstract void stop() throws Exception;
 }

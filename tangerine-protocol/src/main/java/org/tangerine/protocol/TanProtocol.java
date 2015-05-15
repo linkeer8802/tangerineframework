@@ -42,13 +42,13 @@ public class TanProtocol {
 	 * @param extras 额外扩展信息
 	 * @return Packet数据包
 	 */
-	public static Packet buildHandshakeResponse(int code, Map<String, Object> dict, Map<String, Object> extras) {
+	public static Packet buildHandshakeResponse(int code, int heartbeat, Map<String, Object> dict, Map<String, Object> extras) {
 		
 		Packet packet = new Packet(Packet.Type.PCK_HANDSHAKE);
 		
 		HandShakeResponse response = new HandShakeResponse();
 		response.setCode(code);
-		response.setHeartbeat(Config.heartbeat);
+		response.setHeartbeat(heartbeat);
 		response.setDict(dict);
 		response.setExtras(extras);
 		
@@ -66,24 +66,6 @@ public class TanProtocol {
 		Packet packet = new Packet(Packet.Type.PCK_HEARTBEAT);
 		packet.setLength(0);
 		packet.setPayload(Unpooled.EMPTY_BUFFER);
-		
-		return packet;
-	}
-	
-	/**
-	 * 构建消息数据包
-	 * @param code 状态码
-	 * @param dict route字段压缩的映射表
-	 * @param extras 额外扩展信息
-	 * @return Packet数据包
-	 */
-	public static Packet buildMsgPacket(Integer reqId, String route, Object msg) {
-		
-		Packet packet = new Packet(Packet.Type.PCK_DATA);
-		
-		
-		packet.setPayload(Unpooled.wrappedBuffer(JsonUtil.toJsonBytes()));
-		packet.setLength(packet.getPayload().writerIndex());
 		
 		return packet;
 	}

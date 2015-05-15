@@ -8,5 +8,8 @@
   	<module>tangerine-common</module>
   	<module>tangerine-protocol</module>
   	<module>tangerine-container</module>
+  	<module>tangerine-app</module>
+  	<module>tangerine-net</module>
+  	<module>tangerine-handler</module>
   </modules>
 </project>
