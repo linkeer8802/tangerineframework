@@ -23,7 +23,16 @@ public abstract class Component {
 		return def == null ? this.getClass().getSimpleName() : def.value();
 	}
 	
-	public abstract void initialize() throws Exception;
+	/**
+	 * 依赖的组件
+	 * @return
+	 */
+	protected Class<? extends Component>[] depends() {
+		ComponentDef def = this.getClass().getAnnotation(ComponentDef.class);
+		return def == null ? null : def.depends();
+	}
+	
+	protected abstract void initialize() throws Exception;
 	
 	public abstract void start() throws Exception;
 	

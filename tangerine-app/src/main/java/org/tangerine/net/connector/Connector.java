@@ -5,6 +5,8 @@ import io.netty.buffer.ByteBuf;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.tangerine.container.Component;
 import org.tangerine.exception.DecodeException;
 import org.tangerine.exception.PacketHandleException;
@@ -23,6 +25,8 @@ import org.tangerine.net.conn.Connection;
  */
 public abstract class Connector extends Component {
 
+	private static final Log log = LogFactory.getLog(Connector.class);
+	
 	protected String host;
 	protected Integer port;
 	
@@ -83,15 +87,19 @@ public abstract class Connector extends Component {
 	public void afterStart() {
 		if (!hasBindedHandler(MessageHandler.class)) {
 			bindHandler(new MessageHandler());
+			log.info("Bind core handler[MessageHandler] to the connector.");
 		}
 		if (!hasBindedHandler(HandshakeCmdHandler.class)) {
 			bindHandler(new HandshakeCmdHandler());
+			log.info("Bind core handler[HandshakeCmdHandler] to "  + name());
 		}
 		if (!hasBindedHandler(HeartbeatCmdHandler.class)) {
 			bindHandler(new HeartbeatCmdHandler());
+			log.info("Bind core handler[HeartbeatCmdHandler] to "  + name());
 		}
 		if (!hasBindedHandler(ShakeACKHandler.class)) {
 			bindHandler(new ShakeACKHandler());
+			log.info("Bind core handler[ShakeACKHandler] to " + name());
 		}
 	}
 

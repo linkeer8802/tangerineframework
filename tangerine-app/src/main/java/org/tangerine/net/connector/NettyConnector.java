@@ -18,6 +18,8 @@ import io.netty.handler.logging.LoggingHandler;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.tangerine.common.ConfigUtil;
 import org.tangerine.common.json.JsonUtil;
 import org.tangerine.container.ComponentDef;
@@ -31,9 +33,12 @@ import org.tangerine.server.Server;
 @ComponentDef("nettyConnector")
 public class NettyConnector extends Connector {
 	
-	private Channel channel;
+	private static final Log log = LogFactory.getLog(NettyConnector.class);
 	
+	private Channel channel;
 	private NettyIOSocket ioSocket;
+	
+	private Thread connectorThread;
 	
 	@Override
 	public void initialize() throws Exception {
@@ -42,35 +47,46 @@ public class NettyConnector extends Connector {
 		this.port = ConfigUtil.getInt("tangerine.connector.port", 9770);
 		
 		ioSocket = NettyIOSocket.instance();
+		connectorThread = new Thread(run());
+		connectorThread.setDaemon(true);
+		connectorThread.setName("Netty Connector Main Thread.");
+	}
+	
+	private Runnable run() throws Exception {
+		return new Runnable() {
+			@Override
+			public void run() {
+				NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+				NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+				
+				try {
+					ServerBootstrap bootstrap = new ServerBootstrap();
+					bootstrap.group(bossGroup, workerGroup)
+					.channel(NioServerSocketChannel.class) 
+					.handler(new ChannelInitializer<ServerSocketChannel>(){
+						@Override
+						protected void initChannel(ServerSocketChannel ch) throws Exception {
+							ch.pipeline().addLast("log", new LoggingHandler(LogLevel.INFO));
+						}
+						
+					}).childHandler(new ServerChannelInitializer())
+					.option(ChannelOption.SO_BACKLOG, 1024);
+					
+					channel = bootstrap.bind(host, port).sync().channel();
+					channel.closeFuture().sync();
+				} catch (InterruptedException e) {
+					log.warn("Interrupted Connector Thread.");
+				} finally {
+					bossGroup.shutdownGracefully();
+					workerGroup.shutdownGracefully();
+				}
+			}
+		};
 	}
 	
 	@Override
 	public void start() throws Exception {
-		
-		NioEventLoopGroup bossGroup = new NioEventLoopGroup();
-		NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-		
-		try {
-			ServerBootstrap bootstrap = new ServerBootstrap();
-			bootstrap.group(bossGroup, workerGroup)
-			.channel(NioServerSocketChannel.class) 
-			.handler(new ChannelInitializer<ServerSocketChannel>(){
-				@Override
-				protected void initChannel(ServerSocketChannel ch) throws Exception {
-					ch.pipeline().addLast("log", new LoggingHandler(LogLevel.INFO));
-					//TODO
-//					ch.pipeline().addLast("redis", Tangerine.getInstance().getBean(NotifyServiceHandler.class));
-				}
-				
-			}).childHandler(new ServerChannelInitializer())
-			.option(ChannelOption.SO_BACKLOG, 1024);
-			
-			channel = bootstrap.bind(host, port).sync().channel();
-			channel.closeFuture().sync();
-		} finally {
-			bossGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
-		}
+		connectorThread.start();
 	}
 
 	@Override
@@ -109,7 +125,7 @@ public class NettyConnector extends Connector {
 		 * 数据包
 		 */
 		if (packet.getType().equals(Packet.Type.PCK_DATA)) {
-			
+			packet.getPayload().release();
 			return Message.decode(packet.getPayload());
 			
 		} else {

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import org.tangerine.protocol.Message;
 
 @Retention(RetentionPolicy.RUNTIME)  
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD})
 public @interface RuoteMapping {
 
 	public String value();

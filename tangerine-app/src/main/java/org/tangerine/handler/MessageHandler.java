@@ -29,7 +29,9 @@ public class MessageHandler extends Handler<Message> {
 			pmsg.setRoute(msg.getRoutePath());
 		}
 		pmsg.setMessageId(msg.getMessageId());
-		pmsg.setBody(msg.getBody()); 
+		byte[] body = new byte[msg.getBody().readableBytes()];
+		msg.getBody().readBytes(body).release();
+		pmsg.setBody(body); 
 		
 		//路由用户消息
 		ComponentManager.instance().get(Server.class).getRouter().route(conn, pmsg);

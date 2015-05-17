@@ -2,11 +2,9 @@ package org.tangerine.handle.router;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.tangerine.common.StringUtil;
 import org.tangerine.common.json.JsonUtil;
@@ -87,17 +85,14 @@ public abstract class HandlerRouter extends Component {
 				
 			} else {
 				try {
-					byte[] body = new byte[message.getBody().readableBytes()];
-					message.getBody().writeBytes(body);
-					
 					if (ComponentManager.instance().get(Server.class).getUseProtobuf()) {
 						//probuf
 						@SuppressWarnings("rawtypes")
 						Codec codec = ProtobufProxy.create(clz);
-						args.add(codec.decode(body));
+						args.add(codec.decode(message.getBody()));
 					} else {
 						//json
-						args.add(JsonUtil.fromJson(StringUtil.decode(body), clz));
+						args.add(JsonUtil.fromJson(StringUtil.decode(message.getBody()), clz));
 					}
 					
 				} catch (Exception e) {

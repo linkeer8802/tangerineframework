@@ -11,5 +11,6 @@
   	<module>tangerine-app</module>
   	<module>tangerine-net</module>
   	<module>tangerine-handler</module>
+  	<module>tangerine-sample</module>
   </modules>
 </project>

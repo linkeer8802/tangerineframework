@@ -26,7 +26,7 @@ public abstract class CommandHandler<T> extends Handler<Packet> {
 			T cmd = null;
 			if (msg.getLength() > 0) {
 				byte[] payload = new byte[msg.getLength()];
-				msg.getPayload().readBytes(payload);
+				msg.getPayload().readBytes(payload).release();
 				cmd = (T) JsonUtil.fromJson(StringUtil.decode(payload), ParameterUtil.getSuperClassGenricType(getClass()));
 			}
 			handleCmd(conn, cmd);

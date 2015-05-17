@@ -147,7 +147,7 @@ public class Message {
 			}
 		}
 		// FIXME 要保证 buffer为一个且仅为一个完整message包数据
-		message.setBody(buffer.readSlice(buffer.readableBytes()));
+		message.setBody(buffer.readSlice(buffer.readableBytes()).retain());
 		
 		return message;
 	}

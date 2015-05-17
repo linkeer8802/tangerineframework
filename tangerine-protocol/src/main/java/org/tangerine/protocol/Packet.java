@@ -90,7 +90,7 @@ public class Packet {
 		Packet packet = new Packet();
 		packet.setType(buffer.readByte());
 		packet.setLength(buffer.readMedium());
-		packet.setPayload(buffer.readSlice(packet.getLength()));
+		packet.setPayload(buffer.readSlice(packet.getLength()).retain());
 		
 		return packet;
 	}
