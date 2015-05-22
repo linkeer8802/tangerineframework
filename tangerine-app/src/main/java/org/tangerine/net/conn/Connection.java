@@ -13,15 +13,17 @@ import org.tangerine.server.Server;
 
 public abstract class Connection {
 
+	private Integer connId;
+	
 	protected Object channel;
 	
 	protected Map<String, Object> attrs;
 	
-	protected boolean connected;
+	protected volatile boolean connected;
 	
-	protected boolean closed;
+	protected volatile boolean closed;
 	
-	protected long connectTime;
+	protected volatile long connectTime;
 	
 	public Connection(Object channel) {
 		this.channel = channel;
@@ -38,6 +40,10 @@ public abstract class Connection {
 	 * @param packet
 	 */
 	public abstract void deliver(ByteBuf msg);
+	/**
+	 * 关闭连接
+	 */
+	public abstract void close();
 	/**
 	 * 发送消息
 	 * @param messageId 消息Id
@@ -101,5 +107,13 @@ public abstract class Connection {
 
 	public void setConnectTime(long connectTime) {
 		this.connectTime = connectTime;
+	}
+
+	public Integer getConnId() {
+		return connId;
+	}
+
+	public void setConnId(Integer connId) {
+		this.connId = connId;
 	}
 }

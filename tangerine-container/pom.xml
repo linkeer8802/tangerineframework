@@ -7,11 +7,6 @@
   </parent>
   <artifactId>tangerine-container</artifactId>
   <dependencies>
-  	<dependency>
-  		<groupId>org.tangerine</groupId>
-  		<artifactId>tangerine-common</artifactId>
-  		<version>1.0-SNAPSHOT</version>
-  	</dependency>
   	
 	<dependency>
 		<groupId>commons-logging</groupId>
@@ -22,11 +17,21 @@
 		<groupId>log4j</groupId>
 		<artifactId>log4j</artifactId>
 		<version>1.2.17</version>
-	</dependency>  	
+	</dependency>  		
 	<dependency>
 		<groupId>org.springframework</groupId>
 		<artifactId>spring-context</artifactId>
 		<version>3.2.3.RELEASE</version>
-	</dependency>	  	
+	</dependency>
+	<dependency>
+		<groupId>org.tangerine</groupId>
+		<artifactId>tangerine-common</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+		<groupId>org.tangerine</groupId>
+		<artifactId>tangerine-protocol</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</dependency>
   </dependencies>
 </project>

@@ -38,16 +38,18 @@ public class AnnotationHandlerRouter extends HandlerRouter {
 		RoutePath routePath = new RoutePath(msg.getRoute());
 		
 		HandlerWrapper handlerWrapper = getHandler(routePath);
-		Object handler = handlerWrapper.getHandler();
 		
-		if (handlerWrapper != null && handler != null) {
-			for (Method method : handler.getClass().getDeclaredMethods()) {
-				
-				RuoteMapping messageMapping = method.getAnnotation(RuoteMapping.class);
-				if (routePath.getAction().equals(messageMapping.value())) {
+		if (handlerWrapper != null) {
+			Object handler = handlerWrapper.getHandler();
+			if (handler != null) {
+				for (Method method : handler.getClass().getDeclaredMethods()) {
 					
-					return method.invoke(handler, 
-							getHandlerMethodArgs(method, conn, msg));
+					RuoteMapping messageMapping = method.getAnnotation(RuoteMapping.class);
+					if (routePath.getAction().equals(messageMapping.value())) {
+						
+						return method.invoke(handler, 
+								getHandlerMethodArgs(method, conn, msg));
+					}
 				}
 			}
 		}

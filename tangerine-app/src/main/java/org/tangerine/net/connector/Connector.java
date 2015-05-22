@@ -14,8 +14,10 @@ import org.tangerine.handler.Handler;
 import org.tangerine.handler.MessageHandler;
 import org.tangerine.handler.internal.HandshakeCmdHandler;
 import org.tangerine.handler.internal.HeartbeatCmdHandler;
+import org.tangerine.handler.internal.ServerAuthHandler;
 import org.tangerine.handler.internal.ShakeACKHandler;
 import org.tangerine.net.conn.Connection;
+import org.tangerine.net.conn.ConnectionManager;
 
 
 /**
@@ -29,6 +31,8 @@ public abstract class Connector extends Component {
 	
 	protected String host;
 	protected Integer port;
+	
+	protected ConnectionManager connectionManager;
 	
 	protected Set<Handler<?>> handlers = new HashSet<Handler<?>>();
 	
@@ -55,6 +59,7 @@ public abstract class Connector extends Component {
 	 */
 	public final void onData(Connection conn, Object msg) {
 		if (msg instanceof ByteBuf) {
+			System.err.println("error get ByteBuf");
 			try {
 				msg = decode((ByteBuf) msg);
 			} catch (Exception e) {
@@ -87,7 +92,7 @@ public abstract class Connector extends Component {
 	public void afterStart() {
 		if (!hasBindedHandler(MessageHandler.class)) {
 			bindHandler(new MessageHandler());
-			log.info("Bind core handler[MessageHandler] to the connector.");
+			log.info("Bind core handler[MessageHandler] to the connector"  + name());
 		}
 		if (!hasBindedHandler(HandshakeCmdHandler.class)) {
 			bindHandler(new HandshakeCmdHandler());
@@ -100,6 +105,10 @@ public abstract class Connector extends Component {
 		if (!hasBindedHandler(ShakeACKHandler.class)) {
 			bindHandler(new ShakeACKHandler());
 			log.info("Bind core handler[ShakeACKHandler] to " + name());
+		}
+		if (!hasBindedHandler(ServerAuthHandler.class)) {
+			bindHandler(new ServerAuthHandler());
+			log.info("Bind core handler[ServerAuthHandler] to " + name());
 		}
 	}
 

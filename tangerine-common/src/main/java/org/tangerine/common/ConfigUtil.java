@@ -8,13 +8,18 @@ public class ConfigUtil {
 
 	private static Properties properties = new Properties();
 	
-	protected static void load() {
+	public static void load(boolean reload) {
 
-		try {
-			InputStream inputStream = ConfigUtil.class.getClassLoader().getResourceAsStream("conf.properties");
-			properties.load(inputStream);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		if (properties.isEmpty() || reload) {
+			try {
+				InputStream inputStream = ConfigUtil.class.getClassLoader().getResourceAsStream("conf/tangerine.properties");
+				properties.load(inputStream);
+				
+				properties.list(System.out);
+				
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 	

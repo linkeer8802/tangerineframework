@@ -19,7 +19,7 @@ public class Server extends Component {
 
 	private Boolean useDict;
 	
-	private Integer heartbeat = 3;
+	private Integer heartbeat;
 	
 	private Boolean useProtobuf = false;
 	

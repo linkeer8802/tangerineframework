@@ -18,28 +18,16 @@ public abstract class Handler<T> {
 	public abstract void handle(Connection conn, T msg) throws Exception;
 	
 	/**
-	 * 获得Handler超类的泛型类型
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	public final Class getSuperHandlerGenricType() {
-		return ParameterUtil.getSuperClassGenricType(getChildHandlerClass(this));
-	}
-	
-	/**
-	 * 上一级Handler子类的Class
-	 * @param handler
+	 * Handler直接子类的的泛型类型
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static Class getChildHandlerClass(Handler handler) {
-		
-		Class handlerClz = handler.getClass();
+	public final Class getSuperHandlerGenricType() {
+		Class handlerClz = getClass();
 		while(handlerClz.getSuperclass() != null 
 				&& !handlerClz.getSuperclass().isAssignableFrom(Handler.class)) {
 			handlerClz = handlerClz.getSuperclass();
 		}
-		
-		return handlerClz;
+		return ParameterUtil.getSuperClassGenricType(handlerClz);
 	}
 }

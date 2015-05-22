@@ -28,6 +28,9 @@ public class Packet {
 		
 		/**服务器主动断开连接通知**/
 		public static final byte PCK_DISCONNECT = 0x5;
+		
+		/**认证数据包**/
+		public static final byte PCK_AUTH = 0x6;
 	}
 	
 	/**package类型**/
@@ -78,7 +81,7 @@ public class Packet {
 	
 	public static ByteBuf encode(Packet packet) {
 		
-		ByteBuf hBuffer = Unpooled.buffer(LEN_PCK_HEAD);
+		ByteBuf hBuffer = Unpooled.buffer();
 		hBuffer.writeByte(packet.getType());
 		hBuffer.writeMedium(packet.getLength());
 		
@@ -90,7 +93,10 @@ public class Packet {
 		Packet packet = new Packet();
 		packet.setType(buffer.readByte());
 		packet.setLength(buffer.readMedium());
-		packet.setPayload(buffer.readSlice(packet.getLength()).retain());
+		ByteBuf payload = Unpooled.buffer(packet.getLength());
+		buffer.readBytes(payload, 0, packet.getLength());
+		payload.setIndex(0, packet.getLength());
+		packet.setPayload(payload);
 		
 		return packet;
 	}

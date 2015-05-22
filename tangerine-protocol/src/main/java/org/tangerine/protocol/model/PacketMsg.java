@@ -1,5 +1,7 @@
 package org.tangerine.protocol.model;
 
+import java.util.Arrays;
+
 
 /**
  * 用户消息
@@ -36,5 +38,11 @@ public class PacketMsg {
 	
 	public void setBody(byte[] body) {
 		this.body = body;
+	}
+
+	@Override
+	public String toString() {
+		return "PacketMsg [messageId=" + messageId + ", route=" + route
+				+ ", body.len=" + body.length + "]";
 	}
 }

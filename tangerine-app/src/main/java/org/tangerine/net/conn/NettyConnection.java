@@ -23,6 +23,13 @@ public class NettyConnection extends Connection {
 	}
 	
 	@Override
+	public void close() {
+		((Channel) getChannel()).close();
+		connected = false;
+		closed = true;
+	}
+	
+	@Override
 	public Object getAttr(String name) {
 		Object attr = super.getAttr(name);
 		return attr == null ? ((Channel) getChannel()).attr(AttributeKey.valueOf(name)) : attr;

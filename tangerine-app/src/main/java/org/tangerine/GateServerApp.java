@@ -2,39 +2,37 @@ package org.tangerine;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.tangerine.common.ConfigUtil;
 import org.tangerine.container.ComponentManager;
-import org.tangerine.server.Server;
+import org.tangerine.server.GateServer;
 
 
-public class ServerApp {
+public class GateServerApp {
 
-	private static final Log log = LogFactory.getLog(ServerApp.class);
+	private static final Log log = LogFactory.getLog(GateServerApp.class);
 	
 	private String name;
-	private Server server;
+	private GateServer server;
 	private ComponentManager componentManager;
 	private static volatile boolean running = true;
 	
-	public ServerApp(String name) {
+	public GateServerApp(String name) {
 		this.name = name;
 		componentManager = ComponentManager.instance();
-		ConfigUtil.load(false);
 	}
 	
 	public void run() throws Exception {
 		long time = System.currentTimeMillis();
 		
-		this.server = new Server();
+		this.server = new GateServer();
 		componentManager.addComponent(server);
 		componentManager.run();
 		
 		log.info(" App " + name + " started, cost time:" + (System.currentTimeMillis()-time) + "ms");
 		
-		synchronized (ServerApp.class) {
+		synchronized (GateServerApp.class) {
 			while (running) {
 				try {
-					ServerApp.class.wait();
+					GateServerApp.class.wait();
 				} catch (Throwable e) {
 				}
 			}
@@ -50,7 +48,7 @@ public class ServerApp {
 		return name;
 	}
 
-	public Server getServer() {
+	public GateServer getServer() {
 		return server;
 	}
 

@@ -4,8 +4,8 @@ import io.netty.buffer.Unpooled;
 
 import java.util.Map;
 
-import org.tangerine.common.Constant.Config;
 import org.tangerine.common.json.JsonUtil;
+import org.tangerine.protocol.model.AuthResponse;
 import org.tangerine.protocol.model.HandShakeRequest;
 import org.tangerine.protocol.model.HandShakeResponse;
 
@@ -31,7 +31,7 @@ public class TanProtocol {
 		request.setExtras(extras);
 		
 		packet.setPayload(Unpooled.wrappedBuffer(JsonUtil.toJsonBytes(request)));
-		packet.setLength(packet.getPayload().writerIndex());
+		packet.setLength(packet.getPayload().readableBytes());
 		
 		return packet;
 	}
@@ -53,7 +53,7 @@ public class TanProtocol {
 		response.setExtras(extras);
 		
 		packet.setPayload(Unpooled.wrappedBuffer(JsonUtil.toJsonBytes(response)));
-		packet.setLength(packet.getPayload().writerIndex());
+		packet.setLength(packet.getPayload().readableBytes());
 		
 		return packet;
 	}
@@ -66,6 +66,28 @@ public class TanProtocol {
 		Packet packet = new Packet(Packet.Type.PCK_HEARTBEAT);
 		packet.setLength(0);
 		packet.setPayload(Unpooled.EMPTY_BUFFER);
+		
+		return packet;
+	}
+	
+	/**
+	 * 构建认证响应
+	 * @param code 状态码
+	 * @param dict route字段压缩的映射表
+	 * @param extras 额外扩展信息
+	 * @return Packet数据包
+	 */
+	public static Packet buildAuthResponse(int code, String msg, Map<String, Object> extras) {
+		
+		Packet packet = new Packet(Packet.Type.PCK_AUTH);
+		
+		AuthResponse response = new AuthResponse();
+		response.setCode(code);
+		response.setMsg(msg);
+		response.getExtras().putAll(extras);
+		
+		packet.setPayload(Unpooled.wrappedBuffer(JsonUtil.toJsonBytes(response)));
+		packet.setLength(packet.getPayload().readableBytes());
 		
 		return packet;
 	}

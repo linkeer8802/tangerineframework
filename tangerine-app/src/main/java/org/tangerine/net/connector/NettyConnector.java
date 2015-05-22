@@ -13,8 +13,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 
 import java.util.List;
 
@@ -26,6 +24,7 @@ import org.tangerine.container.ComponentDef;
 import org.tangerine.container.ComponentManager;
 import org.tangerine.container.impl.RouteDictionary;
 import org.tangerine.exception.DecodeException;
+import org.tangerine.net.conn.ConnectionManager;
 import org.tangerine.protocol.Message;
 import org.tangerine.protocol.Packet;
 import org.tangerine.server.Server;
@@ -36,9 +35,9 @@ public class NettyConnector extends Connector {
 	private static final Log log = LogFactory.getLog(NettyConnector.class);
 	
 	private Channel channel;
-	private NettyIOSocket ioSocket;
+	protected NettyIOSocket ioSocket;
 	
-	private Thread connectorThread;
+	protected Thread connectorThread;
 	
 	@Override
 	public void initialize() throws Exception {
@@ -49,10 +48,15 @@ public class NettyConnector extends Connector {
 		ioSocket = NettyIOSocket.instance();
 		connectorThread = new Thread(run());
 		connectorThread.setDaemon(true);
-		connectorThread.setName("Netty Connector Main Thread.");
+		connectorThread.setName(name() + " Thread.");
+		
+		if (connectionManager == null) {
+			connectionManager = new ConnectionManager();
+			ComponentManager.instance().addComponent(connectionManager);
+		}
 	}
 	
-	private Runnable run() throws Exception {
+	protected Runnable run() throws Exception {
 		return new Runnable() {
 			@Override
 			public void run() {
@@ -66,7 +70,7 @@ public class NettyConnector extends Connector {
 					.handler(new ChannelInitializer<ServerSocketChannel>(){
 						@Override
 						protected void initChannel(ServerSocketChannel ch) throws Exception {
-							ch.pipeline().addLast("log", new LoggingHandler(LogLevel.INFO));
+//							ch.pipeline().addLast("log", new LoggingHandler(LogLevel.INFO));
 						}
 						
 					}).childHandler(new ServerChannelInitializer())
@@ -75,7 +79,7 @@ public class NettyConnector extends Connector {
 					channel = bootstrap.bind(host, port).sync().channel();
 					channel.closeFuture().sync();
 				} catch (InterruptedException e) {
-					log.warn("Interrupted Connector Thread.");
+					log.warn("Interrupted + "+name()+" + Thread.");
 				} finally {
 					bossGroup.shutdownGracefully();
 					workerGroup.shutdownGracefully();
@@ -107,10 +111,6 @@ public class NettyConnector extends Connector {
 	
 	@Override
 	public Object decode(ByteBuf in) {
-		//头长度
-		if (in.readableBytes() < Packet.LEN_PCK_HEAD) {
-			return null;
-		}
 		//读取头
 		in.markReaderIndex();
 		Packet packet = null;
@@ -120,17 +120,15 @@ public class NettyConnector extends Connector {
 			in.resetReaderIndex();
 			return null;
 		}
-		
+
 		/**
 		 * 数据包
 		 */
 		if (packet.getType().equals(Packet.Type.PCK_DATA)) {
 			packet.getPayload().release();
 			return Message.decode(packet.getPayload());
-			
-		} else {
-			return packet;
 		}
+		return packet;
 	}
 	
 	@Override
@@ -185,7 +183,7 @@ public class NettyConnector extends Connector {
 				}
 				if (message != null) {
 					out.add(message);
-				}
+				} 
 			}
 		};
 	}

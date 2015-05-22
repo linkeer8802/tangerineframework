@@ -1,13 +1,14 @@
 package org.tangerine.sample;
 
-import org.tangerine.ServerApp;
+import org.tangerine.GateServerApp;
 import org.tangerine.container.impl.CoSimpleAuthManager;
 
-public class ServerSample {
+public class GateServerSample {
 
 	public static void main(String[] args) throws Exception {
-		ServerApp app = new ServerApp("chart server");
+		GateServerApp app = new GateServerApp("gate server");
 		app.getComponentManager().addComponent(new CoSimpleAuthManager());
 		app.run();
 	}
+
 }

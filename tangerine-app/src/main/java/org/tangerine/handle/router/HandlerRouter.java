@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.tangerine.common.StringUtil;
 import org.tangerine.common.json.JsonUtil;
 import org.tangerine.container.Component;
@@ -21,6 +23,8 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 
 public abstract class HandlerRouter extends Component {
 
+	private static final Log log = LogFactory.getLog(HandlerRouter.class);
+	
 	protected Map<String, HandlerWrapper> messageHandlers;
 	
 	@Override
@@ -45,7 +49,7 @@ public abstract class HandlerRouter extends Component {
 	
 	protected void noHandlerFound(Connection connection, PacketMsg msg) {
 		//TODO log
-		System.err.println("Handler No Found.");
+		log.warn("Handler No Found for msg:" + msg);
 	}
 	
 	public void route(Connection conn, PacketMsg msg) throws Exception {

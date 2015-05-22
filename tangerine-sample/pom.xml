@@ -6,6 +6,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>tangerine-sample</artifactId>
+  <packaging>jar</packaging>
   <dependencies>
   	<dependency>
   		<groupId>org.tangerine</groupId>

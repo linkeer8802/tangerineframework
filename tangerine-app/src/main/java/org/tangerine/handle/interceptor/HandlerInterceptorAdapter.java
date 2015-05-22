@@ -8,7 +8,7 @@ public class HandlerInterceptorAdapter implements HandlerInterceptor{
 	@Override
 	public boolean preHandle(Connection conn, PacketMsg message)
 			throws Exception {
-		return false;
+		return true;
 	}
 
 	@Override
