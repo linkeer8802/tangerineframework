@@ -93,7 +93,9 @@ public abstract class HandlerRouter extends Component {
 						//probuf
 						@SuppressWarnings("rawtypes")
 						Codec codec = ProtobufProxy.create(clz);
-						args.add(codec.decode(message.getBody()));
+						byte[] body = new byte[message.getBody().readableBytes()];
+						message.getBody().readBytes(body);
+						args.add(codec.decode(body));
 					} else {
 						//json
 						args.add(JsonUtil.fromJson(StringUtil.decode(message.getBody()), clz));

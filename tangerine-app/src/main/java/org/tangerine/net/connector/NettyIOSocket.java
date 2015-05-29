@@ -3,6 +3,8 @@ package org.tangerine.net.connector;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 
 import org.apache.commons.logging.Log;
@@ -52,7 +54,19 @@ public class NettyIOSocket extends ChannelDuplexHandler {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		log.debug("断开连接" + ctx);
+		ComponentManager.instance().get(ConnectionManager.class).remove(ctx.attr(connAttrKey).get().getConnId());
 	}
+	
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            if (e.state() == IdleState.ALL_IDLE) {
+            	log.debug("断开空闲连接" + ctx);
+                ctx.close();
+            }
+        }
+    }
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

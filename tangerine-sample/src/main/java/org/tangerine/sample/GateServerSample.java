@@ -10,5 +10,4 @@ public class GateServerSample {
 		app.getComponentManager().addComponent(new CoSimpleAuthManager());
 		app.run();
 	}
-
 }

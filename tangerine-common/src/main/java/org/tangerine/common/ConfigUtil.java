@@ -1,6 +1,5 @@
 package org.tangerine.common;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -17,7 +16,7 @@ public class ConfigUtil {
 				
 				properties.list(System.out);
 				
-			} catch (IOException e1) {
+			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 		}

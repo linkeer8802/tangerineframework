@@ -17,7 +17,6 @@ public class MessageHandler extends Handler<Message> {
 	@Override
 	public void handle(Connection conn, Message msg) throws Exception {
 		
-		
 		PacketMsg pmsg = new PacketMsg();
 		
 		if (!StringUtils.isEmpty(msg.getRoutePath())
@@ -29,9 +28,9 @@ public class MessageHandler extends Handler<Message> {
 			pmsg.setRoute(msg.getRoutePath());
 		}
 		pmsg.setMessageId(msg.getMessageId());
-		byte[] body = new byte[msg.getBody().readableBytes()];
-		msg.getBody().readBytes(body).release();
-		pmsg.setBody(body); 
+//		byte[] body = new byte[msg.getBody().readableBytes()];
+//		msg.getBody().readBytes(body).release();
+		pmsg.setBody(msg.getBody()); 
 		
 		//路由用户消息
 		ComponentManager.instance().get(Server.class).getRouter().route(conn, pmsg);

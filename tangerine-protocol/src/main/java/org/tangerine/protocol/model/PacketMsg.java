@@ -1,5 +1,7 @@
 package org.tangerine.protocol.model;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.Arrays;
 
 
@@ -14,7 +16,7 @@ public class PacketMsg {
 	/**消息路由路径**/
 	private String route;
 	/**消息体**/
-	private byte[] body;
+	private ByteBuf body;
 	
 	public Integer getMessageId() {
 		return messageId;
@@ -32,17 +34,17 @@ public class PacketMsg {
 		this.route = route;
 	}
 	
-	public byte[] getBody() {
+	public ByteBuf getBody() {
 		return body;
 	}
 	
-	public void setBody(byte[] body) {
+	public void setBody(ByteBuf body) {
 		this.body = body;
 	}
 
 	@Override
 	public String toString() {
 		return "PacketMsg [messageId=" + messageId + ", route=" + route
-				+ ", body.len=" + body.length + "]";
+				+ ", body.len=" + body.readableBytes() + "]";
 	}
 }

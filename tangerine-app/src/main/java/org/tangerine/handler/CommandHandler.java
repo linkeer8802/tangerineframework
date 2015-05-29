@@ -29,10 +29,7 @@ public abstract class CommandHandler<T> extends Handler<Packet> {
 		if (msg.getType().equals(type)) {
 			T cmd = null;
 			if (msg.getLength() > 0) {
-				byte[] payload = new byte[msg.getPayload().readableBytes()];
-				msg.getPayload().readBytes(payload).release();
-				String decode = StringUtil.decode(payload);
-				
+				String decode = StringUtil.decode(msg.getPayload().array());
 				try {
 					cmd = (T) JsonUtil.fromJson(decode, getCommandHandlerGenricType());
 				} catch (Exception e) {

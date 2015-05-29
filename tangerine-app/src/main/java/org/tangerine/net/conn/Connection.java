@@ -25,6 +25,8 @@ public abstract class Connection {
 	
 	protected volatile long connectTime;
 	
+	protected volatile long lastHeartBeat;
+	
 	public Connection(Object channel) {
 		this.channel = channel;
 		attrs = new HashMap<String, Object>();
@@ -115,5 +117,13 @@ public abstract class Connection {
 
 	public void setConnId(Integer connId) {
 		this.connId = connId;
+	}
+
+	public long getLastHeartBeat() {
+		return lastHeartBeat;
+	}
+
+	public void setLastHeartBeat(long lastHeartBeat) {
+		this.lastHeartBeat = lastHeartBeat;
 	}
 }

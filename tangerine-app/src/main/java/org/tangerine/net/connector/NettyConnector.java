@@ -13,6 +13,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.List;
 
@@ -104,19 +105,20 @@ public class NettyConnector extends Connector {
 		public void initChannel(SocketChannel ch) throws Exception {
 			ch.pipeline().addLast("packetDecoder", _decode());
 			ch.pipeline().addLast("packetEncoder", _encode());
-//			ch.pipeline().addLast("ping", new IdleStateHandler(60, 15, 13));
+			ch.pipeline().addLast("ping", new IdleStateHandler(0, 0,
+					ComponentManager.instance().get(Server.class).getHeartbeat()*2));
 			ch.pipeline().addLast("ioSocket",  ioSocket);
 		}
 	}
 	
 	@Override
 	public Object decode(ByteBuf in) {
-		//读取头
+		
 		in.markReaderIndex();
-		Packet packet = null;
-		try {
-			packet = Packet.decode(in);
-		} catch (IndexOutOfBoundsException e) {
+		
+		Packet packet = Packet.decode(in);
+		
+		if (packet == null) {
 			in.resetReaderIndex();
 			return null;
 		}
@@ -125,9 +127,11 @@ public class NettyConnector extends Connector {
 		 * 数据包
 		 */
 		if (packet.getType().equals(Packet.Type.PCK_DATA)) {
+			Message message = Message.decode(packet.getPayload());
 			packet.getPayload().release();
-			return Message.decode(packet.getPayload());
+			return message;
 		}
+		
 		return packet;
 	}
 	
@@ -192,8 +196,56 @@ public class NettyConnector extends Connector {
 		return new MessageToByteEncoder<Packet>(){
 			@Override
 			protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf out) throws Exception {
-				out.writeBytes(Packet.encode(packet));
+				ByteBuf encode = Packet.encode(packet);
+				out.writeBytes(encode);
+				encode.release();
 			}
 		};
 	}
+	
+//	class PacketDecoder extends ChannelInboundHandlerAdapter {
+//		
+//		private final Log log = LogFactory.getLog(PacketDecoder.class);
+//		
+//		private ByteBuf cumulation;
+//		
+//		@Override
+//		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+//			if (msg instanceof ByteBuf) {
+//				try {
+//					ByteBuf data = (ByteBuf) msg;
+//					if (cumulation == null) {
+//					    cumulation = data;
+//					} else {
+//						if (cumulation.writerIndex() > cumulation.maxCapacity() - data.readableBytes()) {
+//							log.info("expandCumulation...");
+//							expandCumulation(ctx, data.readableBytes());
+//						}
+//						cumulation.writeBytes(data);
+//						data.release();
+//					}
+//					Object message = NettyConnector.this.decode(cumulation);
+//					if (message != null) {
+//						ctx.fireChannelRead(message);
+//					}
+//				} catch (Exception e) {
+//					throw new DecodeException(e);
+//				}finally {
+//	                if (cumulation != null && !cumulation.isReadable()) {
+//	                    cumulation.release();
+//	                    cumulation = null;
+//	                }
+//				}
+//			} else {
+//				ctx.fireChannelRead(msg);
+//			}
+//		}
+//		
+//	    private void expandCumulation(ChannelHandlerContext ctx, int readable) {
+//	        ByteBuf oldCumulation = cumulation;
+//	        cumulation = ctx.alloc().buffer(oldCumulation.readableBytes() + readable);
+//	        cumulation.writeBytes(oldCumulation);
+//	        oldCumulation.release();
+//	    }
+//	}
 }

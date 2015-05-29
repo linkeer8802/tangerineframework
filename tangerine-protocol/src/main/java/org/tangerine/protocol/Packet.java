@@ -90,13 +90,26 @@ public class Packet {
 	
 	public static Packet decode(ByteBuf buffer) {
 		
+		if (buffer.readableBytes() < LEN_PCK_HEAD) {
+			return null;
+		}
+		
+		byte type = buffer.readByte();
+		int len = buffer.readMedium();
+		
+		if (buffer.readableBytes() < len) {
+			return null;
+		}
+		
 		Packet packet = new Packet();
-		packet.setType(buffer.readByte());
-		packet.setLength(buffer.readMedium());
+		packet.setType(type);
+		packet.setLength(len);
 		ByteBuf payload = Unpooled.buffer(packet.getLength());
 		buffer.readBytes(payload, 0, packet.getLength());
 		payload.setIndex(0, packet.getLength());
 		packet.setPayload(payload);
+		
+//		packet.setPayload(buffer.readSlice(packet.getLength()).retain());
 		
 		return packet;
 	}

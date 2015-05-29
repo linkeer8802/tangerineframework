@@ -39,6 +39,7 @@ public class ConnectionManager extends Component {
 	
 	public Connection remove(Integer id) {
 		log.info("remove Connection[id=" + id + "]");
+		idGenerator.decrementAndGet();
 		return connections.remove(id);
 	}
 	

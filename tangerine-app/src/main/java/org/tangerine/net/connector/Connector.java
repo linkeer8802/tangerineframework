@@ -18,6 +18,8 @@ import org.tangerine.handler.internal.ServerAuthHandler;
 import org.tangerine.handler.internal.ShakeACKHandler;
 import org.tangerine.net.conn.Connection;
 import org.tangerine.net.conn.ConnectionManager;
+import org.tangerine.protocol.Message;
+import org.tangerine.protocol.Packet;
 
 
 /**
@@ -58,16 +60,32 @@ public abstract class Connector extends Component {
 	 * @param msg
 	 */
 	public final void onData(Connection conn, Object msg) {
-		if (msg instanceof ByteBuf) {
-			System.err.println("error get ByteBuf");
-			try {
-				msg = decode((ByteBuf) msg);
-			} catch (Exception e) {
-				throw new DecodeException(e);
+		try {
+			if (msg instanceof ByteBuf) {
+				System.err.println("error get ByteBuf");
+				try {
+					msg = decode((ByteBuf) msg);
+				} catch (Exception e) {
+					throw new DecodeException(e);
+				}
+			}
+			
+			handler(conn, msg);
+		} finally {
+			if (msg instanceof Packet) {
+				Packet packet = (Packet) msg;
+                if (packet.getPayload() != null) {
+                	packet.getPayload().release();
+                	packet.setPayload(null);
+                }
+			} else if (msg instanceof Message) {
+				Message message = (Message) msg;
+                if (message.getBody() != null) {
+                	message.getBody().release();
+                	message.setBody(null);
+                }
 			}
 		}
-		
-		handler(conn, msg);
 	}
 	/**
 	 * 

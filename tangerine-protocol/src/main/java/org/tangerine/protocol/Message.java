@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.UnsupportedEncodingException;
+
+import org.tangerine.common.StringUtil;
 /**
  * 普通IM消息
  * @author weird
@@ -133,20 +135,14 @@ public class Message {
 			//没有使用路由压缩
 			if (!message.getRouteFlag()) {
 				byte lenRoutePath = buffer.readByte();
-				byte[] dst = new byte[lenRoutePath];
-				buffer.readBytes(dst);
-				try {
-					message.setRoutePath(new String(dst, "utf-8"));
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
+				message.setRoutePath(StringUtil.decode(buffer.readSlice(lenRoutePath)));
 				//使用路由压缩
 			} else { 
 				Short routeId = buffer.readShort();
 				message.setRoutePath(routeId.toString());
 			}
 		}
-		// FIXME 要保证 buffer为一个且仅为一个完整message包数据
+		// import! 要保证 buffer为一个且仅为一个完整message包数据
 		message.setBody(buffer.readSlice(buffer.readableBytes()).retain());
 		
 		return message;
@@ -185,4 +181,19 @@ public class Message {
 		
 		return Unpooled.wrappedBuffer(hMessageBuf, message.getBody());
 	}
+	
+//	public static void main(String[] args) throws Exception {
+//		ByteBuf buf = Unpooled.buffer(32);
+//		buf.writeByte(3);
+//		byte[] bytes = "this is a test buf demo.".getBytes("utf-8");
+//		buf.writeByte(bytes.length);
+//		buf.writeBytes(bytes);
+//		buf.writeByte(55);
+//		
+//		buf.readByte();
+//		int len = buf.readByte();
+//		ByteBuf strbuf = buf.readSlice(len);
+//		
+//		System.out.println(StringUtil.decode(strbuf));
+//	}
 }
