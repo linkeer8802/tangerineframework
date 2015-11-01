@@ -12,6 +12,7 @@
   	<module>tangerine-net</module>
   	<module>tangerine-handler</module>
   	<module>tangerine-sample</module>
+  	<module>tangerine-client</module>
   </modules>
   
     <build>

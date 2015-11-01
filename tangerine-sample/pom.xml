@@ -33,7 +33,7 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<resources>
+<!-- 		<resources>
  			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
@@ -41,6 +41,6 @@
 					<exclude>**/*.properties</exclude>
 				</excludes>
 			</resource>
-		</resources>
+		</resources> -->
 	</build>
 </project>
